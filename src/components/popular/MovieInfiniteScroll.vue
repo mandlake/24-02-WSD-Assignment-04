@@ -1,12 +1,18 @@
 <template>
   <div class="movie-grid" ref="gridContainer">
     <div :class="['grid-container', currentView]">
-      <div v-for="(movieGroup, index) in visibleMovieGroups" :key="index"
-           :class="['movie-row', { 'full': movieGroup.length === rowSize }]">
-        <div v-for="movie in movieGroup" :key="movie.id" class="movie-card"
-             @mouseup="toggleWishlist(movie)"
+      <div
+        v-for="(movieGroup, index) in visibleMovieGroups"
+        :key="index"
+        :class="['movie-row', { full: movieGroup.length === rowSize }]"
+      >
+        <div
+          v-for="movie in movieGroup"
+          :key="movie.id"
+          class="movie-card"
+          @mouseup="toggleWishlist(movie)"
         >
-          <img :src="getImageUrl(movie.poster_path)" :alt="movie.title">
+          <img :src="getImageUrl(movie.poster_path)" :alt="movie.title" />
           <div class="movie-title">{{ movie.title }}</div>
           <div v-if="isInWishlist(movie.id)" class="wishlist-indicator">👍</div>
         </div>
@@ -15,14 +21,27 @@
     <div ref="loadingTrigger" class="loading-trigger">
       <div v-if="isLoading" class="loading-indicator">Loading...</div>
     </div>
-    <button v-show="showTopButton" @click="scrollToTopAndReset" class="top-button">Top</button>
+    <button
+      v-show="showTopButton"
+      @click="scrollToTopAndReset"
+      class="top-button"
+    >
+      Top
+    </button>
   </div>
 </template>
 
 <script lang="ts">
-import {ref, computed, onMounted, onUnmounted, defineComponent, watch} from 'vue';
-import axios from 'axios';
-import {useWishlist} from "@/script/movie/wishlist.ts";
+import {
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  defineComponent,
+  watch,
+} from "vue";
+import axios from "axios";
+import { useWishlist } from "@/script/movie/wishlist.ts";
 
 interface Movie {
   id: number;
@@ -34,27 +53,26 @@ interface Movie {
 }
 
 export default defineComponent({
-  name: 'MovieGrid',
+  name: "MovieGrid",
   props: {
-    genreCode : {
+    genreCode: {
       type: String,
-      required: true
+      required: true,
     },
     apiKey: {
       type: String,
-      required: true
+      required: true,
     },
     sortingOrder: {
       type: String,
       required: true,
-      default: 'all'
+      default: "all",
     },
     voteEverage: {
       type: Number,
       required: true,
-      default: 100
-
-    }
+      default: 100,
+    },
   },
   setup(props) {
     const movies = ref<Movie[]>([]);
@@ -64,25 +82,34 @@ export default defineComponent({
     const rowSize = ref(4);
     const isLoading = ref(false);
     const isMobile = ref(window.innerWidth <= 768);
-    const currentView = ref('grid');
+    const currentView = ref("grid");
     const hasMore = ref(true);
     const showTopButton = ref(false);
     let wishlistTimer: number | null = null;
 
-    watch(() => props.genreCode, () => {
-      resetMovies();
-    });
+    watch(
+      () => props.genreCode,
+      () => {
+        resetMovies();
+      }
+    );
 
-    watch(() => props.sortingOrder, () => {
-      resetMovies();
-    });
+    watch(
+      () => props.sortingOrder,
+      () => {
+        resetMovies();
+      }
+    );
 
-    watch(() => props.voteEverage, () => {
-      resetMovies();
-    });
+    watch(
+      () => props.voteEverage,
+      () => {
+        resetMovies();
+      }
+    );
 
     // Use the wishlist composable
-    const {  loadWishlist, toggleWishlist, isInWishlist } = useWishlist();
+    const { loadWishlist, toggleWishlist, isInWishlist } = useWishlist();
 
     const fetchMovies = async (): Promise<void> => {
       if (isLoading.value || !hasMore.value) return;
@@ -92,26 +119,28 @@ export default defineComponent({
       try {
         if (props.genreCode === "0") {
           response = await axios.get<{ results: Movie[] }>(
-              `https://api.themoviedb.org/3/movie/popular`, {
-                params: {
-                  api_key: props.apiKey,
-                  language: 'ko-KR',
-                  page: currentPage.value,
-                  per_page: 10
-                }
-              }
+            `https://api.themoviedb.org/3/movie/popular`,
+            {
+              params: {
+                api_key: props.apiKey,
+                language: "ko-KR",
+                page: currentPage.value,
+                per_page: 10,
+              },
+            }
           );
         } else {
           response = await axios.get<{ results: Movie[] }>(
-              `https://api.themoviedb.org/3/discover/movie`, {
-                params: {
-                  api_key: props.apiKey,
-                  with_genres: props.genreCode,
-                  language: 'ko-KR',
-                  page: currentPage.value,
-                  per_page: 10
-                }
-              }
+            `https://api.themoviedb.org/3/discover/movie`,
+            {
+              params: {
+                api_key: props.apiKey,
+                with_genres: props.genreCode,
+                language: "ko-KR",
+                page: currentPage.value,
+                per_page: 10,
+              },
+            }
           );
         }
 
@@ -119,16 +148,21 @@ export default defineComponent({
         if (newMovies.length > 0) {
           let movieArray = [...movies.value, ...newMovies];
 
-          if (props.sortingOrder !== 'all') {
-            movieArray = movieArray.filter((movie) => movie.original_language === props.sortingOrder);
+          if (props.sortingOrder !== "all") {
+            movieArray = movieArray.filter(
+              (movie) => movie.original_language === props.sortingOrder
+            );
           }
 
           movieArray = movieArray.filter((movie) => {
             let result = false;
 
             if (props.voteEverage === -1) result = true;
-            else if(props.voteEverage === -2) result = movie.vote_average <= 4;
-            else result = movie.vote_average >= props.voteEverage && movie.vote_average < props.voteEverage + 1;
+            else if (props.voteEverage === -2) result = movie.vote_average <= 4;
+            else
+              result =
+                movie.vote_average >= props.voteEverage &&
+                movie.vote_average < props.voteEverage + 1;
 
             return result;
           });
@@ -140,14 +174,16 @@ export default defineComponent({
           hasMore.value = false;
         }
       } catch (error) {
-        console.error('Error fetching movies:', error);
+        console.error("Error fetching movies:", error);
       } finally {
         isLoading.value = false;
       }
     };
 
     const getImageUrl = (path: string | null): string => {
-      return path ? `https://image.tmdb.org/t/p/w300${path}` : '/placeholder-image.jpg';
+      return path
+        ? `https://image..org/t/p/w300${path}`
+        : "/placeholder-image.jpg";
     };
 
     const calculateLayout = (): void => {
@@ -156,7 +192,9 @@ export default defineComponent({
         const movieCardWidth = isMobile.value ? 100 : 300;
         const horizontalGap = isMobile.value ? 10 : 15;
 
-        rowSize.value = Math.floor(containerWidth / (movieCardWidth + horizontalGap));
+        rowSize.value = Math.floor(
+          containerWidth / (movieCardWidth + horizontalGap)
+        );
       }
     };
 
@@ -182,16 +220,22 @@ export default defineComponent({
       const lastRow = gridContainer.value.lastElementChild;
       if (!lastRow) return;
 
-      const containerBottom = gridContainer.value.getBoundingClientRect().bottom;
+      const containerBottom =
+        gridContainer.value.getBoundingClientRect().bottom;
       const lastRowBottom = lastRow.getBoundingClientRect().bottom;
 
-      if (containerBottom >= lastRowBottom - 100 && !isLoading.value && hasMore.value) {
+      if (
+        containerBottom >= lastRowBottom - 100 &&
+        !isLoading.value &&
+        hasMore.value
+      ) {
         fetchMovies();
       }
     };
 
     const handleScroll = (): void => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
       showTopButton.value = scrollTop > 300;
       checkAndLoadMore();
     };
@@ -206,7 +250,7 @@ export default defineComponent({
     const scrollToTopAndReset = (): void => {
       window.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
       resetMovies();
     };
@@ -231,16 +275,16 @@ export default defineComponent({
       });
       calculateLayout();
       loadWishlist();
-      window.addEventListener('resize', handleResize);
-      window.addEventListener('scroll', handleScroll);
+      window.addEventListener("resize", handleResize);
+      window.addEventListener("scroll", handleScroll);
 
       const observer = new IntersectionObserver(
-          (entries) => {
-            if (entries[0].isIntersecting && !isLoading.value && hasMore.value) {
-              fetchMovies();
-            }
-          },
-          { rootMargin: '100px', threshold: 0.1 }
+        (entries) => {
+          if (entries[0].isIntersecting && !isLoading.value && hasMore.value) {
+            fetchMovies();
+          }
+        },
+        { rootMargin: "100px", threshold: 0.1 }
       );
 
       if (loadingTrigger.value) {
@@ -248,8 +292,8 @@ export default defineComponent({
       }
 
       onUnmounted(() => {
-        window.removeEventListener('resize', handleResize);
-        window.removeEventListener('scroll', handleScroll);
+        window.removeEventListener("resize", handleResize);
+        window.removeEventListener("scroll", handleScroll);
         if (loadingTrigger.value) {
           observer.unobserve(loadingTrigger.value);
         }
@@ -270,15 +314,15 @@ export default defineComponent({
       startWishlistTimer,
       clearWishlistTimer,
       toggleWishlist,
-      isInWishlist
+      isInWishlist,
     };
-  }
+  },
 });
 </script>
 
-
 <style scoped>
-html, body {
+html,
+body {
   overflow-y: scroll !important;
 }
 
@@ -296,7 +340,6 @@ html, body {
   align-items: center;
 }
 
-
 .wishlist-indicator {
   position: absolute;
   top: -10px;
@@ -304,7 +347,6 @@ html, body {
   font-size: 30px;
   background-color: rgba(229, 9, 20, 0.5);
 }
-
 
 .movie-row {
   display: flex;
@@ -376,7 +418,7 @@ html, body {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: #E50914;
+  background-color: #e50914;
   color: white;
   border: none;
   border-radius: 50%;

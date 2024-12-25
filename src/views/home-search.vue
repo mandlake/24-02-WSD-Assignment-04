@@ -54,7 +54,7 @@ const changeOptions = (options: {
     </div>
     <div class="content-search">
       <MovieInfiniteScroll
-        :api-key="process.env.MOVIE_API_KEY"
+        :api-key="apiKey"
         :genre-code="genreId"
         :sorting-order="sortId"
         :vote-everage="ageId"
