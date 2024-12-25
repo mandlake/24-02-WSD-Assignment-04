@@ -39,9 +39,25 @@ import * as Kakao from "kakao-js-sdk";
 // 카카오 로그인 함수 추가
 const tryKakaoLogin = async (success, fail) => {
   try {
-    const authResult = await Kakao.Auth.login({
-      scope: "profile_nickname, account_email", // 필요한 정보만 요청
+    Kakao.Auth.authorize({
+      redirectUri: process.env.REDIRECT_URL,
     });
+
+    var token = getCookie("authorize-access-token");
+
+    if (token) {
+      Kakao.Auth.setAccessToken(token);
+      Kakao.Auth.getStatusInfo()
+        .then((res) => {
+          if (res.status === "connected") {
+            document.getElementById("token-result").innerText =
+              "login success, token: " + Kakao.Auth.getAccessToken();
+          }
+        })
+        .catch((err) => {
+          Kakao.Auth.setAccessToken(null);
+        });
+    }
     console.log(authResult);
 
     // 로그인 성공 시 사용자 정보 가져오기
