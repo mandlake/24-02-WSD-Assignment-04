@@ -1,7 +1,10 @@
-
 <!-- BannerComponent.vue -->
 <template>
-  <div v-if="movie" class="banner" :style="{ backgroundImage: `url(${backdropUrl})` }">
+  <div
+    v-if="movie"
+    class="banner"
+    :style="{ backgroundImage: `url(${backdropUrl})` }"
+  >
     <div class="banner-content">
       <h1>{{ movie.title }}</h1>
       <p>{{ movie.overview }}</p>
@@ -13,17 +16,19 @@
 
 <script>
 export default {
-  name: 'BannerComponent',
+  name: "BannerComponent",
   props: {
     movie: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     backdropUrl() {
       console.log(this.movie);
-      return this.movie ? `https://image.tmdb.org/t/p/original${this.movie.backdrop_path}` : '';
+      return this.movie
+        ? `https://image.tmdb.org/t/p/original${this.movie.backdrop_path}`
+        : "";
     },
   },
 };
@@ -43,7 +48,7 @@ export default {
 
 .banner-content {
   padding: 50px;
-  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
   width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -63,7 +68,8 @@ export default {
   text-align: left;
 }
 
-.play-btn, .info-btn {
+.play-btn,
+.info-btn {
   padding: 10px 20px;
   margin-right: 10px;
   border: none;
@@ -93,17 +99,19 @@ export default {
     margin-bottom: 0.5rem;
   }
 
-
   .banner-content {
     padding: 15px;
-    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.8) 0%,
+      transparent 100%
+    );
     width: 100%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
   }
-
 
   .banner p {
     font-size: 0.9rem;
@@ -118,5 +126,4 @@ export default {
     font-size: 0.75rem;
   }
 }
-
 </style>

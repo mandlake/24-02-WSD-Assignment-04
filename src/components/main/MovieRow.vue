@@ -1,43 +1,70 @@
 <template>
   <div class="movie-row">
     <h2>{{ title }}</h2>
-    <div class="slider-container"
-         @wheel="handleWheel"
-         @touchstart="handleTouchStart"
-         @touchmove="handleTouchMove"
-         @touchend="handleTouchEnd"
-         @mousemove="handleMouseMove"
-         @mouseleave="handleMouseLeave">
-      <button class="slider-button left" @click="slide('left')" :style="{ opacity: showButtons && !atLeftEdge ? 1 : 0 }" :disabled="atLeftEdge">&lt;</button>
+    <div
+      class="slider-container"
+      @wheel="handleWheel"
+      @touchstart="handleTouchStart"
+      @touchmove="handleTouchMove"
+      @touchend="handleTouchEnd"
+      @mousemove="handleMouseMove"
+      @mouseleave="handleMouseLeave"
+    >
+      <button
+        class="slider-button left"
+        @click="slide('left')"
+        :style="{ opacity: showButtons && !atLeftEdge ? 1 : 0 }"
+        :disabled="atLeftEdge"
+      >
+        &lt;
+      </button>
       <div class="slider-window" ref="sliderWindow">
-        <div class="movie-slider" ref="slider" :style="{ transform: `translateX(${-scrollAmount}px)` }">
-          <div v-for="movie in movies" :key="movie.id" class="movie-card" @click="toggleWishlist(movie)">
-            <img :src="getImageUrl(movie.poster_path)" :alt="movie.title">
-            <div v-if="isInWishlist(movie.id)" class="wishlist-indicator">👍</div>
+        <div
+          class="movie-slider"
+          ref="slider"
+          :style="{ transform: `translateX(${-scrollAmount}px)` }"
+        >
+          <div
+            v-for="movie in movies"
+            :key="movie.id"
+            class="movie-card"
+            @click="toggleWishlist(movie)"
+          >
+            <img :src="getImageUrl(movie.poster_path)" :alt="movie.title" />
+            <div v-if="isInWishlist(movie.id)" class="wishlist-indicator">
+              👍
+            </div>
           </div>
         </div>
       </div>
-      <button class="slider-button right" @click="slide('right')" :style="{ opacity: showButtons && !atRightEdge ? 1 : 0 }" :disabled="atRightEdge">&gt;</button>
+      <button
+        class="slider-button right"
+        @click="slide('right')"
+        :style="{ opacity: showButtons && !atRightEdge ? 1 : 0 }"
+        :disabled="atRightEdge"
+      >
+        &gt;
+      </button>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted, computed, watch } from 'vue';
-import axios from 'axios';
-import { useWishlist } from '@/script/movie/wishlist'; // 경로는 실제 위치에 맞게 조정해주세요
+import { ref, onMounted, computed, watch } from "vue";
+import axios from "axios";
+import { useWishlist } from "@/script/movie/wishlist"; // 경로는 실제 위치에 맞게 조정해주세요
 
 export default {
-  name: 'MovieRow',
+  name: "MovieRow",
   props: {
     title: {
       type: String,
-      required: true
+      required: true,
     },
     fetchUrl: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   setup(props) {
     const movies = ref([]);
@@ -53,7 +80,10 @@ export default {
 
     const calculateMaxScroll = () => {
       if (slider.value && sliderWindow.value) {
-        return Math.max(0, slider.value.scrollWidth - sliderWindow.value.clientWidth);
+        return Math.max(
+          0,
+          slider.value.scrollWidth - sliderWindow.value.clientWidth
+        );
       }
       return 0;
     };
@@ -69,7 +99,7 @@ export default {
         movies.value = response.data.results;
         console.log(movies);
       } catch (error) {
-        console.error('Error fetching movies:', error);
+        console.error("Error fetching movies:", error);
       }
     };
 
@@ -79,10 +109,13 @@ export default {
 
     const slide = (direction, amount = null) => {
       const slideAmount = amount || sliderWindow.value.clientWidth * 0.8;
-      if (direction === 'left') {
+      if (direction === "left") {
         scrollAmount.value = Math.max(0, scrollAmount.value - slideAmount);
       } else {
-        scrollAmount.value = Math.min(maxScroll.value, scrollAmount.value + slideAmount);
+        scrollAmount.value = Math.min(
+          maxScroll.value,
+          scrollAmount.value + slideAmount
+        );
       }
     };
 
@@ -99,7 +132,7 @@ export default {
       if (isScrolling.value) return;
 
       isScrolling.value = true;
-      const direction = event.deltaY > 0 ? 'right' : 'left';
+      const direction = event.deltaY > 0 ? "right" : "left";
       slide(direction);
 
       setTimeout(() => {
@@ -121,7 +154,7 @@ export default {
       const minSwipeDistance = 50; // 최소 스와이프 거리
 
       if (Math.abs(touchDiff) > minSwipeDistance) {
-        const direction = touchDiff > 0 ? 'right' : 'left';
+        const direction = touchDiff > 0 ? "right" : "left";
         slide(direction, Math.abs(touchDiff));
       }
     };
@@ -133,7 +166,7 @@ export default {
 
     onMounted(() => {
       fetchMovies();
-      window.addEventListener('resize', handleResize);
+      window.addEventListener("resize", handleResize);
       handleResize();
     });
 
@@ -159,14 +192,13 @@ export default {
       handleTouchMove,
       handleTouchEnd,
       toggleWishlist,
-      isInWishlist
+      isInWishlist,
     };
-  }
+  },
 };
 </script>
 
 <style scoped>
-
 .wishlist-indicator {
   position: absolute;
   top: 5px;
@@ -263,7 +295,6 @@ export default {
     overflow: hidden;
   }
 
-
   .movie-card {
     flex: 0 0 auto;
     width: 120px;
@@ -271,18 +302,15 @@ export default {
     transition: transform 0.3s;
   }
 
-
   .movie-slider {
     display: flex;
     transition: transform 0.3s ease;
     padding: 0px 0;
   }
 
-
   .slider-window {
     overflow: hidden;
     margin: 0 10px;
   }
 }
-
 </style>

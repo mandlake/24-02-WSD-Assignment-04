@@ -1,10 +1,13 @@
 <template>
   <div id="container">
-    <header class="app-header" :class="{ 'scrolled': isScrolled }">
+    <header class="app-header" :class="{ scrolled: isScrolled }">
       <div class="header-left">
         <div class="logo">
           <a href="/#/">
-            <font-awesome-icon :icon="['fas', 'ticket']" style="height: 100%; color: #E50914;" />
+            <font-awesome-icon
+              :icon="['fas', 'ticket']"
+              style="height: 100%; color: #e50914"
+            />
           </a>
         </div>
         <nav class="nav-links desktop-nav">
@@ -19,23 +22,30 @@
         <button class="icon-button" @click="removeKey">
           <font-awesome-icon :icon="['fas', 'user']" />
         </button>
-        <button class="icon-button mobile-menu-button" @click="toggleMobileMenu">
+        <button
+          class="icon-button mobile-menu-button"
+          @click="toggleMobileMenu"
+        >
           <font-awesome-icon :icon="['fas', 'bars']" />
         </button>
       </div>
     </header>
 
     <!-- Mobile Navigation -->
-    <div class="mobile-nav" :class="{ 'open': isMobileMenuOpen }">
+    <div class="mobile-nav" :class="{ open: isMobileMenuOpen }">
       <button class="close-button" @click="toggleMobileMenu">
         <font-awesome-icon :icon="['fas', 'times']" />
       </button>
       <nav>
         <ul>
           <li><a href="/#/" @click="toggleMobileMenu">홈</a></li>
-          <li><a href="/#/popular" @click="toggleMobileMenu">대세 콘텐츠</a></li>
+          <li>
+            <a href="/#/popular" @click="toggleMobileMenu">대세 콘텐츠</a>
+          </li>
           <li><a href="/#/search" @click="toggleMobileMenu">찾아보기</a></li>
-          <li><a href="/#/wishlist" @click="toggleMobileMenu">내가 찜한 리스트</a></li>
+          <li>
+            <a href="/#/wishlist" @click="toggleMobileMenu">내가 찜한 리스트</a>
+          </li>
         </ul>
       </nav>
     </div>
@@ -43,46 +53,51 @@
 </template>
 
 <script>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faSearch, faUser, faTicket, faBars, faTimes } from '@fortawesome/free-solid-svg-icons'
-import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import {
+  faSearch,
+  faUser,
+  faTicket,
+  faBars,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
+import { library } from "@fortawesome/fontawesome-svg-core";
 
 library.add(faSearch, faUser, faTicket, faBars, faTimes);
 
 export default {
-  name: 'MainHeader',
+  name: "MainHeader",
   components: {
-    FontAwesomeIcon
+    FontAwesomeIcon,
   },
   data() {
     return {
       isScrolled: false,
-      isMobileMenuOpen: false
-    }
+      isMobileMenuOpen: false,
+    };
   },
   methods: {
     removeKey() {
-      localStorage.removeItem('TMDb-Key');
-      this.$router.push('/signin');
+      localStorage.removeItem("TMDb-Key");
+      this.$router.push("/signin");
     },
     toggleMobileMenu() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen;
     },
     handleScroll() {
       this.isScrolled = window.scrollY > 50;
-    }
+    },
   },
   mounted() {
-    window.addEventListener('scroll', this.handleScroll);
+    window.addEventListener("scroll", this.handleScroll);
   },
   beforeUnmount() {
-    window.removeEventListener('scroll', this.handleScroll);
-  }
+    window.removeEventListener("scroll", this.handleScroll);
+  },
 };
 </script>
 
 <style>
-
 .app-header {
   height: 40px;
   display: flex;

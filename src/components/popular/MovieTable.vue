@@ -1,12 +1,18 @@
 <template>
   <div class="movie-grid" ref="gridContainer">
     <div :class="['grid-container', currentView]">
-      <div v-for="(movieGroup, index) in visibleMovieGroups" :key="index"
-           :class="['movie-row', { 'full': movieGroup.length === rowSize }]">
-        <div v-for="movie in movieGroup" :key="movie.id" class="movie-card"
-             @mouseup="toggleWishlist(movie)"
+      <div
+        v-for="(movieGroup, index) in visibleMovieGroups"
+        :key="index"
+        :class="['movie-row', { full: movieGroup.length === rowSize }]"
+      >
+        <div
+          v-for="movie in movieGroup"
+          :key="movie.id"
+          class="movie-card"
+          @mouseup="toggleWishlist(movie)"
         >
-          <img :src="getImageUrl(movie.poster_path)" :alt="movie.title">
+          <img :src="getImageUrl(movie.poster_path)" :alt="movie.title" />
           <div class="movie-title">{{ movie.title }}</div>
           <div v-if="isInWishlist(movie.id)" class="wishlist-indicator">👍</div>
         </div>
@@ -15,23 +21,25 @@
     <div class="pagination" v-if="totalPages > 1">
       <button @click="prevPage" :disabled="currentPage === 1">&lt; 이전</button>
       <span>{{ currentPage }} / {{ totalPages }}</span>
-      <button @click="nextPage" :disabled="currentPage === totalPages">다음 &gt;</button>
+      <button @click="nextPage" :disabled="currentPage === totalPages">
+        다음 &gt;
+      </button>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
-import axios from 'axios';
-import {useWishlist} from "@/script/movie/wishlist.ts";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+import axios from "axios";
+import { useWishlist } from "@/script/movie/wishlist.ts";
 
 export default {
-  name: 'MovieGrid',
+  name: "MovieGrid",
   props: {
     fetchUrl: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   setup(props) {
     const movies = ref([]);
@@ -40,11 +48,12 @@ export default {
     const rowSize = ref(4);
     const moviesPerPage = ref(20);
     const isMobile = ref(window.innerWidth <= 768);
-    const currentView = ref('grid');
+    const currentView = ref("grid");
     let wishlistTimer = null;
 
     // Use the wishlist composable
-    const { wishlist, loadWishlist, toggleWishlist, isInWishlist } = useWishlist();
+    const { wishlist, loadWishlist, toggleWishlist, isInWishlist } =
+      useWishlist();
 
     const fetchMovies = async () => {
       try {
@@ -57,8 +66,8 @@ export default {
           const response = await axios.get(props.fetchUrl, {
             params: {
               page: page,
-              per_page: moviesPerPage
-            }
+              per_page: moviesPerPage,
+            },
           });
           allMovies = [...allMovies, ...response.data.results];
         }
@@ -66,7 +75,7 @@ export default {
         // 원하는 수만큼 잘라내기
         movies.value = allMovies.slice(0, totalMoviesNeeded);
       } catch (error) {
-        console.error('Error fetching movies:', error);
+        console.error("Error fetching movies:", error);
       }
     };
 
@@ -77,14 +86,19 @@ export default {
     const calculateLayout = () => {
       if (gridContainer.value) {
         const containerWidth = gridContainer.value.offsetWidth;
-        const containerHeight = window.innerHeight - gridContainer.value.offsetTop;
+        const containerHeight =
+          window.innerHeight - gridContainer.value.offsetTop;
         const movieCardWidth = isMobile.value ? 90 : 200;
         const movieCardHeight = isMobile.value ? 150 : 220;
         const horizontalGap = isMobile.value ? 10 : 15;
         const verticalGap = -10;
 
-        rowSize.value = Math.floor(containerWidth / (movieCardWidth + horizontalGap));
-        const maxRows = Math.floor(containerHeight / (movieCardHeight + verticalGap));
+        rowSize.value = Math.floor(
+          containerWidth / (movieCardWidth + horizontalGap)
+        );
+        const maxRows = Math.floor(
+          containerHeight / (movieCardHeight + verticalGap)
+        );
         moviesPerPage.value = rowSize.value * maxRows;
       }
     };
@@ -104,7 +118,9 @@ export default {
       }, []);
     });
 
-    const totalPages = computed(() => Math.ceil(movies.value.length / moviesPerPage.value));
+    const totalPages = computed(() =>
+      Math.ceil(movies.value.length / moviesPerPage.value)
+    );
 
     const nextPage = () => {
       if (currentPage.value < totalPages.value) {
@@ -141,11 +157,11 @@ export default {
       fetchMovies();
       calculateLayout();
       loadWishlist();
-      window.addEventListener('resize', handleResize);
+      window.addEventListener("resize", handleResize);
     });
 
     onUnmounted(() => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     });
 
     watch([rowSize, moviesPerPage], () => {
@@ -164,9 +180,9 @@ export default {
       startWishlistTimer,
       clearWishlistTimer,
       toggleWishlist,
-      isInWishlist
+      isInWishlist,
     };
-  }
+  },
 };
 </script>
 
@@ -250,7 +266,6 @@ export default {
   text-align: left;
   white-space: normal;
 }
-
 
 .pagination {
   display: flex;

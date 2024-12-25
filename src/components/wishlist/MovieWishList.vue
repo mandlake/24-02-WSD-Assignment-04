@@ -1,11 +1,18 @@
 <template>
   <div class="movie-grid" ref="gridContainer">
     <div :class="['grid-container', currentView]">
-      <div v-for="(movieGroup, index) in visibleWishlistMovies" :key="index"
-           :class="['movie-row', { 'full': movieGroup.length === rowSize }]">
-        <div v-for="movie in movieGroup" :key="movie.id" class="movie-card"
-             @click="toggleWishlist(movie)">
-          <img :src="getImageUrl(movie.poster_path)" :alt="movie.title">
+      <div
+        v-for="(movieGroup, index) in visibleWishlistMovies"
+        :key="index"
+        :class="['movie-row', { full: movieGroup.length === rowSize }]"
+      >
+        <div
+          v-for="movie in movieGroup"
+          :key="movie.id"
+          class="movie-card"
+          @click="toggleWishlist(movie)"
+        >
+          <img :src="getImageUrl(movie.poster_path)" :alt="movie.title" />
           <div class="movie-title">{{ movie.title }}</div>
           <div class="wishlist-indicator">👍</div>
         </div>
@@ -17,46 +24,56 @@
     <div class="pagination" v-if="totalPages > 1">
       <button @click="prevPage" :disabled="currentPage === 1">&lt; 이전</button>
       <span>{{ currentPage }} / {{ totalPages }}</span>
-      <button @click="nextPage" :disabled="currentPage === totalPages">다음 &gt;</button>
+      <button @click="nextPage" :disabled="currentPage === totalPages">
+        다음 &gt;
+      </button>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useWishlist } from "@/script/movie/wishlist.ts";
 
 export default {
-  name: 'MovieGrid',
+  name: "MovieGrid",
   setup() {
     const gridContainer = ref(null);
     const rowSize = ref(4);
     const moviesPerPage = ref(20);
     const currentPage = ref(1);
     const isMobile = ref(window.innerWidth <= 768);
-    const currentView = ref('grid');
+    const currentView = ref("grid");
 
-    const { wishlist, loadWishlist, toggleWishlist, isInWishlist } = useWishlist();
+    const { wishlist, loadWishlist, toggleWishlist, isInWishlist } =
+      useWishlist();
 
     const wishlistMovies = computed(() => {
       return wishlist.value;
     });
 
     const getImageUrl = (path) => {
-      return path ? `https://image.tmdb.org/t/p/w300${path}` : '/placeholder-image.jpg';
+      return path
+        ? `https://image.tmdb.org/t/p/w300${path}`
+        : "/placeholder-image.jpg";
     };
 
     const calculateLayout = () => {
       if (gridContainer.value) {
         const containerWidth = gridContainer.value.offsetWidth;
-        const containerHeight = window.innerHeight - gridContainer.value.offsetTop;
+        const containerHeight =
+          window.innerHeight - gridContainer.value.offsetTop;
         const movieCardWidth = isMobile.value ? 90 : 220;
         const movieCardHeight = isMobile.value ? 150 : 330;
         const horizontalGap = isMobile.value ? 10 : 15;
         const verticalGap = -10;
 
-        rowSize.value = Math.floor(containerWidth / (movieCardWidth + horizontalGap));
-        const maxRows = Math.floor(containerHeight / (movieCardHeight + verticalGap));
+        rowSize.value = Math.floor(
+          containerWidth / (movieCardWidth + horizontalGap)
+        );
+        const maxRows = Math.floor(
+          containerHeight / (movieCardHeight + verticalGap)
+        );
         moviesPerPage.value = rowSize.value * maxRows;
       }
     };
@@ -76,7 +93,9 @@ export default {
       }, []);
     });
 
-    const totalPages = computed(() => Math.ceil(wishlistMovies.value.length / moviesPerPage.value));
+    const totalPages = computed(() =>
+      Math.ceil(wishlistMovies.value.length / moviesPerPage.value)
+    );
 
     const nextPage = () => {
       if (currentPage.value < totalPages.value) {
@@ -98,11 +117,11 @@ export default {
     onMounted(() => {
       loadWishlist();
       calculateLayout();
-      window.addEventListener('resize', handleResize);
+      window.addEventListener("resize", handleResize);
     });
 
     onUnmounted(() => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     });
 
     watch([rowSize, moviesPerPage], () => {
@@ -120,12 +139,11 @@ export default {
       gridContainer,
       rowSize,
       toggleWishlist,
-      isInWishlist
+      isInWishlist,
     };
-  }
+  },
 };
 </script>
-
 
 <style scoped>
 .wishlist-indicator {

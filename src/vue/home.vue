@@ -6,21 +6,21 @@
 </template>
 
 <script>
-import {defineComponent} from "vue";
+import { defineComponent } from "vue";
 import MainHeader from "@/vue/header.vue";
 
 export default defineComponent({
   components: {
-    MainHeader
-  }
-})
+    MainHeader,
+  },
+});
 </script>
 
 <style>
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   overflow-x: hidden;
   background-color: #2b2b2b;
